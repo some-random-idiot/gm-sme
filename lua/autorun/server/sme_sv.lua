@@ -84,56 +84,32 @@ end
 
 local soundPatchChangeVolOld = soundPatchMeta.ChangeVolume
 local soundPatchChangePitchOld = soundPatchMeta.ChangePitch
+local soundPatchFadeOutOld = soundPatchMeta.FadeOut
 function soundPatchMeta:ChangeVolume(vol, delta)
-    delta = delta and delta or 10
-    
+    soundPatchChangeVolOld(self, vol, delta)
+
     if muffle:GetBool() then
+        -- Delta support is not possible because get volume always return 0 for some god-forsaken reason.
         local relation = soundPatchRelations[self]
         
         if not relation then return end
 
-        -- local timerName = tostring(self) .. "ChangeVolume"
-        
-        -- if delta > 0 then
-        --     local mult = (vol - self:GetVolume()) / math.max(math.abs(vol - self:GetVolume()), 1)
-
-        --     if mult != 0 then
-        --         timer.Create(timerName, 0, 0, function()
-        --             if mult > 0 and self:GetVolume() >= vol or mult < 0 and self:GetVolume() <= vol then timer.Remove(timerName) return end
-
-        --             net.Start("SMENetworkSoundPatchPlay", true)  -- We technically modify sounds using EmitSound so...
-        --             net.WriteEntity(relation[1])
-        --             net.WriteString(relation[2])
-        --             net.WriteUInt(self:GetSoundLevel(), 8)
-        --             net.WriteUInt(self:GetPitch(), 8)
-        --             net.WriteFloat(self:GetVolume())
-        --             net.WriteUInt(self:GetDSP(), 8)
-        --             -- I have no fuckin idea why SND_IGNORE_NAME prevents a bug where the sound wouldn't change volume the second time.
-        --             net.WriteUInt(SND_CHANGE_VOL + SND_IGNORE_NAME, 11)
-        --             net.Broadcast()
-
-        --             self:ChangeVolume(self:GetVolume() + mult * delta / FrameTime())
-        --         end)
-        --     end
-        -- else
-            net.Start("SMENetworkSoundPatchPlay", true)  -- We technically modify sounds using EmitSound so...
-            net.WriteEntity(relation[1])
-            net.WriteString(relation[2])
-            net.WriteUInt(self:GetSoundLevel(), 8)
-            net.WriteUInt(self:GetPitch(), 8)
-            net.WriteFloat(vol)
-            net.WriteUInt(self:GetDSP(), 8)
-            net.WriteUInt(SND_CHANGE_VOL + SND_IGNORE_NAME, 11)
-            net.Broadcast()
-        -- end
+        net.Start("SMENetworkSoundPatchPlay", true)  -- We technically modify sounds using EmitSound so...
+        net.WriteEntity(relation[1])
+        net.WriteString(relation[2])
+        net.WriteUInt(self:GetSoundLevel(), 8)
+        net.WriteUInt(self:GetPitch(), 8)
+        net.WriteFloat(vol)
+        net.WriteUInt(self:GetDSP(), 8)
+        net.WriteUInt(SND_CHANGE_VOL + SND_IGNORE_NAME, 11)
+        net.Broadcast()
     end
-
-    soundPatchChangeVolOld(self, vol, delta)
 end
 function soundPatchMeta:ChangePitch(pitch, delta)
-    delta = delta and delta or 0
+    soundPatchChangePitchOld(self, pitch, delta)
     
     if muffle:GetBool() then
+        -- Same delta situation here.
         local relation = soundPatchRelations[self]
         
         if not relation then return end
@@ -145,11 +121,29 @@ function soundPatchMeta:ChangePitch(pitch, delta)
         net.WriteUInt(pitch, 8)
         net.WriteFloat(self:GetVolume())
         net.WriteUInt(self:GetDSP(), 8)
-        net.WriteUInt(SND_CHANGE_PITCH + SND_IGNORE_NAME, 11)  -- Is SND_IGNORE_NAME really needed here too?
+        net.WriteUInt(SND_CHANGE_PITCH + SND_IGNORE_NAME, 11)
         net.Broadcast()
     end
+end
+function soundPatchMeta:FadeOut(seconds)
+    soundPatchFadeOutOld(self, seconds)
 
-    soundPatchChangePitchOld(self, pitch, delta)
+    if muffle:GetBool() then
+        -- Same delta situation here.
+        local relation = soundPatchRelations[self]
+        
+        if not relation then return end
+
+        net.Start("SMENetworkSoundPatchPlay", true)
+        net.WriteEntity(relation[1])
+        net.WriteString(relation[2])
+        net.WriteUInt(self:GetSoundLevel(), 8)
+        net.WriteUInt(self:GetPitch(), 8)
+        net.WriteFloat(0)
+        net.WriteUInt(self:GetDSP(), 8)
+        net.WriteUInt(SND_CHANGE_VOL + SND_IGNORE_NAME, 11)
+        net.Broadcast()
+    end
 end
 
 cvars.AddChangeCallback("sme_active", function(cvar, old, new)
