@@ -163,10 +163,6 @@ end)
 net.Receive("SMENetworkSound", function()
     local snd = net.ReadTable()
 
-    -- Player footsteps are special. They do not trigger clientside EntityEmitSound, so we can't add them to the predictedSounds registry.
-    -- I don't really trust this condition check to be compatible with footstep sound overhauls.
-    -- if string.find(snd.SoundName, "player/footsteps/") and snd.Entity == LocalPlayer() then return end
-    
     if snd.SentenceIndex then
         -- Special case for NPC voice lines.
         EmitSentence(snd.OriginalSoundName, snd.Entity:GetPos(), snd.Entity:EntIndex(), snd.Channel, snd.Volume, snd.SoundLevel, snd.Flags, snd.Pitch)
