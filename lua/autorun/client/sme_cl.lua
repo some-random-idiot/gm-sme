@@ -10,7 +10,7 @@ local farMuffleDistance = CreateConVar("sme_far_muffle_dist", 5000, {FCVAR_ARCHI
 -- This is to ensure that other hooks down the line recieve proper sound data.
 hook.Add("EntityEmitSound", "zSMEMuffler",  function(sndData)
     if not muffle:GetBool() then return end
-
+    
     local entity = sndData.Entity
     local ply = LocalPlayer()
     local playedBySME = string.sub(sndData.SoundName, 1, 1) == ":"
@@ -123,13 +123,10 @@ hook.Add("EntityEmitSound", "zSMEMuffler",  function(sndData)
         elseif distMin >= minThickness:GetInt() then
             dsp = 30
         end
+        if attenuation:GetBool() then sndData.Volume = 1000 / origin:Distance(eyePos) end
     elseif farAF then
         dsp = 132
-    end
-
-    if attenuation:GetBool() and sndData.Volume > 0 then
-        -- Some sounds simply turn down the volume to 0 to disable itself.
-        sndData.Volume = (farAF and 1200 or 1000) / origin:Distance(eyePos)
+        if attenuation:GetBool() then sndData.Volume = 1500 / origin:Distance(eyePos) end
     end
 
     if dsp == 1 then
