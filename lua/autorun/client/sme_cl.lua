@@ -160,13 +160,15 @@ end)
 net.Receive("SMENetworkSound", function()
     local snd = net.ReadTable()
 
-    if snd.SentenceIndex then
-        -- Special case for NPC voice lines.
+    if snd.SentenceIndex and IsValid(snd.Entity) then
+        -- Voice lines.
         EmitSentence(snd.OriginalSoundName, snd.Entity:GetPos(), snd.Entity:EntIndex(), snd.Channel, snd.Volume, snd.SoundLevel, snd.Flags, snd.Pitch)
     elseif (IsValid(snd.Entity) and snd.Entity:IsWorld() or not IsValid(snd.Entity)) and snd.Pos then
+        -- Sound without a true source.
         -- If position is also nil, assume it's a bogus source.
         EmitSound(snd.SoundName, snd.Pos, 0, snd.Channel, snd.Volume, snd.SoundLevel, snd.Flags, snd.Pitch, snd.DSP)
     elseif IsValid(snd.Entity) and not snd.Entity:IsWorld() then
+        -- Sound with true source.
         snd.Entity:EmitSound(":" .. snd.SoundName, snd.SoundLevel, snd.Pitch, snd.Volume, snd.Channel, snd.Flags, snd.DSP)
     end
 end)
