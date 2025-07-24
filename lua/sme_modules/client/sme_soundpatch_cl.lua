@@ -1,6 +1,7 @@
 -- TODO: Test garbage collection.
 
 local networkedSoundPatches = {}
+local entNetworkedSoundPatches = {}
 
 net.Receive("SMENetworkCreateSound", function()
     local ent = net.ReadEntity()
@@ -12,6 +13,10 @@ net.Receive("SMENetworkCreateSound", function()
 
     -- Use entity and sound name combined as a key because "You can only create one CSoundPatch per audio file, per entity at the same time.".
     networkedSoundPatches[ent:EntIndex() .. snd] = soundPatch
+
+    if not entNetworkedSoundPatches[ent] then entNetworkedSoundPatches[ent] = {} end
+
+    table.insert(entNetworkedSoundPatches[ent], soundPatch)
 end)
 
 net.Receive("SMENetworkSoundPatchPlay", function()
@@ -22,6 +27,8 @@ net.Receive("SMENetworkSoundPatchPlay", function()
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
     soundPatch:Play()
+
+    PrintTable(networkedSoundPatches)
 end)
 
 net.Receive("SMENetworkSoundPatchPlayEx", function()
@@ -102,4 +109,15 @@ net.Receive("SMENetworkSoundPatchSetSoundLevel", function()
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
     soundPatch:SetSoundLevel(level)
+end)
+
+hook.Add("EntityRemoved", "SMEEntCSoundPatchRemove", function(ent, fullUpdate)
+    if fullUpdate then return end
+    if not entNetworkedSoundPatches[ent] then return end
+
+    for _, soundPatch in ipairs(entNetworkedSoundPatches[ent]) do
+        soundPatch:Stop()
+    end
+
+    entNetworkedSoundPatches[ent] = nil  -- For garbage collection.
 end)

@@ -1,3 +1,9 @@
+local cl_luas, _ = file.Find("sme_modules/client/*", "LUA")
+
+for _, lua in ipairs(cl_luas) do
+    include("sme_modules/client/" .. lua)
+end
+
 hook.Add("EntityRemoved", "SMEEntRemoved", function(ent, fullUpdate)
     if fullUpdate then return end
 
