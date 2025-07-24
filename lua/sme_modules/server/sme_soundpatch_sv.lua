@@ -15,9 +15,9 @@ local muffle = GetConVar("sme_active")
 local soundPatchRelations = {}
 
 local oldCreateSound = CreateSound
-local oldVJCreateSound = VJ.CreateSound
-
 CreateSound = function(ent, snd, recipientfilter)
+    recipientfilter = recipientfilter and recipientfilter or player.GetAll()
+
     local soundPatch = oldCreateSound(ent, snd, recipientfilter)
 
     soundPatchRelations[soundPatch] = {
@@ -30,38 +30,41 @@ CreateSound = function(ent, snd, recipientfilter)
     net.WriteEntity(ent)
     net.WriteString(snd)
     net.Send(recipientfilter)
-
+    
     return soundPatch
 end
 
--- VJ's CreateSound uses localized CreateSound, which means we can't override CreateSound and call it a day.
--- Hopefully, not many addons does this.
-function VJ.CreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
-    local oldCustomFunc = customFunc
+if VJ then
+    local oldVJCreateSound = VJ.CreateSound
+    -- VJ's CreateSound uses localized CreateSound, which means we can't override CreateSound and call it a day.
+    -- Hopefully, not many addons does this.
+    function VJ.CreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
+        local oldCustomFunc = customFunc
 
-    customFunc = function(sndP)
-        -- This has to be done because VJ's CreateSound calls PlayEx right after a soundpatch is created.
-        -- Luckily, custom function is called right in the middle of it.
-        soundPatchRelations[sndP] = {
-            Entity = ent,
-            SoundName = sdFile,
-            RecipientFilter = VJ_RecipientFilter
-        }
+        customFunc = function(sndP)
+            -- This has to be done because VJ's CreateSound calls PlayEx right after a soundpatch is created.
+            -- Luckily, custom function is called right in the middle of it.
+            soundPatchRelations[sndP] = {
+                Entity = ent,
+                SoundName = sdFile,
+                RecipientFilter = VJ_RecipientFilter
+            }
 
-        if oldCustomFunc then oldCustomFunc(sndP) end
+            if oldCustomFunc then oldCustomFunc(sndP) end
+        end
+
+        local soundPatch = oldVJCreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
+
+        net.Start("SMENetworkCreateSound")
+        net.WriteEntity(ent)
+        net.WriteString(sdFile)
+        net.Send(VJ_RecipientFilter)
+
+        soundPatch:SetSoundLevel(sdLevel)
+        soundPatch:ChangePitch(sdPitch)
+
+        return soundPatch
     end
-
-    local soundPatch = oldVJCreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
-
-    net.Start("SMENetworkCreateSound")
-    net.WriteEntity(ent)
-    net.WriteString(sdFile)
-    net.Send(VJ_RecipientFilter)
-
-    soundPatch:SetSoundLevel(sdLevel)
-    soundPatch:ChangePitch(sdPitch)
-
-    return soundPatch
 end
 
 local soundPatchMeta = FindMetaTable("CSoundPatch")
