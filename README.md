@@ -12,10 +12,12 @@ Have you ever thought how odd it is that sounds do not seem to care about walls?
 - Multiplayer compatible. Each player will hear different muffling levels based on their position.
 
 ## Commands
-
 - **sme_active** (serverside) - Enable or disable sound muffling.
 - **sme_attenuation** - Enable or disable custom attenuation. Disable this if you think sound radii are too low.
 - **sme_sound_bouncing** - Enable or disable sound bouncing. You can turn this off if you're experiencing performance problems. Note that this makes sound muffling way less accurate.
 - **sme_sound_launch_dist** - Part of sound bouncing. How far can a sound launch from a source before it starts bouncing.
 - **sme_min_thickness** - How much distance between you and where a sound source hit a solid for muffling effect to apply. Increase if you think sounds get muffled too easily. Decrease if you think that sounds hardly gets muffled. Setting it to 0 effectively disables it.
 - **sme_far_muffle_dist** - How far away should a sound be for it to be muffled regardless of occlusion. Setting it to 0 effectively disables it.
+
+## Demo
+Addon demonstration can be found [here](https://steamcommunity.com/sharedfiles/filedetails/?id=3529402381).
