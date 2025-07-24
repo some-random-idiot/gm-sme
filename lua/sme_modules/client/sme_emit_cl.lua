@@ -1,5 +1,7 @@
 local predictedSounds = {}
-local muffle = CreateConVar("sme_active", 1, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Enable or disable sound muffling.", 0, 1)
+
+local muffle = GetConVar("sme_active")
+
 local attenuation = CreateConVar("sme_attenuation", 1, {FCVAR_ARCHIVE}, "Enable or disable custom attenuation. Disable this if you think sound radii are too low.", 0, 1)
 local soundBounce = CreateConVar("sme_sound_bouncing", 1, {FCVAR_ARCHIVE}, "Enable or disable sound bouncing. You can turn this off if you're experiencing performance problems. Note that this makes sound muffling way less accurate.", 0, 1)
 local soundLaunchDist = CreateConVar("sme_sound_launch_dist", 200, {FCVAR_ARCHIVE}, "Part of sound bouncing. How far can a sound launch from a source before it starts bouncing.", 1, 1000)

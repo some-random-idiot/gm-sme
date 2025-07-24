@@ -1,0 +1,1 @@
+CreateConVar("sme_active", 1, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Enable or disable sound muffling.", 0, 1)
