@@ -37,7 +37,7 @@ net.Receive("SMENetworkSoundPatchPlayEx", function()
     local snd = net.ReadString()
     local vol = net.ReadFloat()
     local pitch = net.ReadUInt(8)
-
+    
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
@@ -88,7 +88,7 @@ net.Receive("SMENetworkSoundPatchChangeVol", function()
     
     if not soundPatch then return end
     
-    soundPatch:ChangePitch(vol, delta)
+    soundPatch:ChangeVolume(vol, delta)
 end)
 
 net.Receive("SMENetworkSoundPatchFadeOut", function()
