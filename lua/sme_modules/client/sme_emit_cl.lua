@@ -125,10 +125,10 @@ hook.Add("EntityEmitSound", "zSMEMuffler",  function(sndData)
         elseif distMin >= minThickness:GetInt() then
             dsp = 30
         end
-        if attenuation:GetBool() then sndData.Volume = 1000 / origin:Distance(eyePos) end
+        if attenuation:GetBool() then sndData.Volume = math.min(1000 / origin:Distance(eyePos), sndData.Volume) end
     elseif farAF then
         dsp = 132
-        if attenuation:GetBool() then sndData.Volume = 1500 / origin:Distance(eyePos) end
+        if attenuation:GetBool() then sndData.Volume = math.min(1500 / origin:Distance(eyePos), sndData.Volume) end
     end
 
     if dsp == 1 then
