@@ -161,7 +161,7 @@ end)
 
 net.Receive("SMENetworkSound", function()
     local snd = net.ReadTable()
-
+    
     if snd.SentenceIndex and IsValid(snd.Entity) then
         -- Voice lines.
         EmitSentence(snd.OriginalSoundName, snd.Entity:GetPos(), snd.Entity:EntIndex(), snd.Channel, snd.Volume, snd.SoundLevel, snd.Flags, snd.Pitch)

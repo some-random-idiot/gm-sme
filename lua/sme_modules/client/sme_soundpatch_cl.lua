@@ -6,7 +6,7 @@ local entNetworkedSoundPatches = {}
 net.Receive("SMENetworkCreateSound", function()
     local ent = net.ReadEntity()
     local snd = net.ReadString()
-
+    
     if not IsValid(ent) then return end
 
     local soundPatch = CreateSound(ent, snd)
@@ -22,13 +22,14 @@ end)
 net.Receive("SMENetworkSoundPatchPlay", function()
     local ent = net.ReadEntity()
     local snd = net.ReadString()
-
+    
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
-    soundPatch:Play()
 
-    PrintTable(networkedSoundPatches)
+    if not soundPatch then return end
+
+    soundPatch:Play()
 end)
 
 net.Receive("SMENetworkSoundPatchPlayEx", function()
@@ -40,6 +41,9 @@ net.Receive("SMENetworkSoundPatchPlayEx", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+
+    if not soundPatch then return end
+
     soundPatch:PlayEx(vol, pitch)
 end)
 
@@ -50,6 +54,9 @@ net.Receive("SMENetworkSoundPatchStop", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+
+    if not soundPatch then return end
+
     soundPatch:Stop()
 end)
 
@@ -63,6 +70,9 @@ net.Receive("SMENetworkSoundPatchChangePitch", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    
+    if not soundPatch then return end
+
     soundPatch:ChangePitch(pitch, delta)
 end)
 
@@ -75,6 +85,9 @@ net.Receive("SMENetworkSoundPatchChangeVol", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    
+    if not soundPatch then return end
+    
     soundPatch:ChangePitch(vol, delta)
 end)
 
@@ -86,6 +99,9 @@ net.Receive("SMENetworkSoundPatchFadeOut", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    
+    if not soundPatch then return end
+
     soundPatch:FadeOut(seconds)
 end)
 
@@ -97,6 +113,9 @@ net.Receive("SMENetworkSoundPatchSetDSP", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    
+    if not soundPatch then return end
+    
     soundPatch:SetDSP(dsp)
 end)
 
@@ -108,6 +127,9 @@ net.Receive("SMENetworkSoundPatchSetSoundLevel", function()
     if not IsValid(ent) then return end
 
     local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    
+    if not soundPatch then return end
+    
     soundPatch:SetSoundLevel(level)
 end)
 
