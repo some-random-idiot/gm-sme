@@ -10,7 +10,7 @@ local farMuffleDistance = CreateConVar("sme_far_muffle_dist", 5000, {FCVAR_ARCHI
 
 -- Bump this to top of the hooks stack (bottom most order-wise) using a "z" prefix, because it attaches the real sound name when it's done.
 -- This is to ensure that other hooks down the line recieve proper sound data.
-hook.Add("EntityEmitSound", "zSMEMuffler",  function(sndData)
+hook.Add("EntityEmitSound", "~SMEMuffler",  function(sndData)
     if not muffle:GetBool() then return end
     
     local entity = sndData.Entity
