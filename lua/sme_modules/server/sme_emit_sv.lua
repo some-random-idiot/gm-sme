@@ -4,6 +4,10 @@ local muffle = GetConVar("sme_active")
 
 hook.Add("EntityEmitSound", "SMEMuffler",  function(sndData)
     if not muffle:GetBool() then return end
+
+    if IsValid(sndData.Entity) and not sndData.Pos then
+        sndData.Pos = sndData.Entity:GetPos()
+    end
     
     net.Start("SMENetworkSound", true)
     net.WriteTable(sndData)
