@@ -8,8 +8,9 @@ local soundLaunchDist = CreateConVar("sme_sound_launch_dist", 200, {FCVAR_ARCHIV
 local minThickness = CreateConVar("sme_min_thickness", 100, {FCVAR_ARCHIVE}, "How much distance between you and where a sound source hit a solid for muffling effect to apply. Increase if you think sounds get muffled too easily. Decrease if you think that sounds hardly gets muffled. Setting it to 0 effectively disables it.", 0, 1000)
 local farMuffleDistance = CreateConVar("sme_far_muffle_dist", 5000, {FCVAR_ARCHIVE}, "How far away should a sound be for it to be muffled regardless of occlusion. Setting it to 0 effectively disables it.", 0, 10000)
 
--- Bump this to top of the hooks stack (bottom most order-wise) using a "z" prefix, because it attaches the real sound name when it's done.
--- This is to ensure that other hooks down the line recieve proper sound data.
+-- Bump this to top of the hooks stack (bottom most in the list) using a ~ prefix.
+-- This is to ensure that other hooks down the line recieve real sound name and not the prefixed version.
+-- The reason that this works is because ~ comes after everything in ASCII: https://en.wikipedia.org/wiki/ASCII.
 hook.Add("EntityEmitSound", "~~~SMEMuffler",  function(sndData)
     if not muffle:GetBool() then return end
     
