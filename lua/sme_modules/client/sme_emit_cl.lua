@@ -8,10 +8,25 @@ local soundLaunchDist = CreateConVar("sme_sound_launch_dist", 200, {FCVAR_ARCHIV
 local minThickness = CreateConVar("sme_min_thickness", 100, {FCVAR_ARCHIVE}, "How much distance between you and where a sound source hit a solid for muffling effect to apply. Increase if you think sounds get muffled too easily. Decrease if you think that sounds hardly gets muffled. Setting it to 0 effectively disables it.", 0, 1000)
 local farMuffleDistance = CreateConVar("sme_far_muffle_dist", 5000, {FCVAR_ARCHIVE}, "How far away should a sound be for it to be muffled regardless of occlusion. Setting it to 0 effectively disables it.", 0, 10000)
 
--- Bump this to top of the hooks stack (bottom most in the list) using a ~ prefix.
+-- Bump this to top of the hooks stack.
 -- This is to ensure that other hooks down the line recieve real sound name and not the prefixed version.
--- The reason that this works is because ~ comes after everything in ASCII: https://en.wikipedia.org/wiki/ASCII.
-hook.Add("EntityEmitSound", "~~~SMEMuffler",  function(sndData)
+local tildeCount = 1
+local emitSoundHookTable = hook.GetTable()["EntityEmitSound"]
+
+if emitSoundHookTable then
+    local emitSoundHooks = table.GetKeys(emitSoundHookTable)
+    table.sort(emitSoundHooks, function(a, b)
+        return a < b
+    end)
+    
+    local _, replaceCount = string.gsub(emitSoundHooks[#emitSoundHooks], "~", "~")
+
+    tildeCount = replaceCount
+end
+
+local tildes = string.rep("~", tildeCount + 1)
+
+hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
     if not muffle:GetBool() then return end
     
     local entity = sndData.Entity
@@ -162,7 +177,7 @@ end)
 
 net.Receive("SMENetworkSound", function()
     local snd = net.ReadTable()
-    
+
     if snd.SentenceIndex and IsValid(snd.Entity) then
         -- Voice lines.
         EmitSentence(snd.OriginalSoundName, snd.Entity:GetPos(), snd.Entity:EntIndex(), snd.Channel, snd.Volume, snd.SoundLevel, snd.Flags, snd.Pitch)

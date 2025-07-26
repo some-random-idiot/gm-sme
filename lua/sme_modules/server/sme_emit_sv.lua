@@ -8,6 +8,11 @@ local emitSoundHookTable = hook.GetTable()["EntityEmitSound"]
 
 if emitSoundHookTable then
     local emitSoundHooks = table.GetKeys(emitSoundHookTable)
+    table.sort(emitSoundHooks, function(a, b)
+        -- GetKeys returns in an unsorted manner.
+        return a < b
+    end)
+    
     local _, replaceCount = string.gsub(emitSoundHooks[1], "!", "!")
 
     exclamationCount = replaceCount
