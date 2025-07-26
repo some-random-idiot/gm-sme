@@ -40,6 +40,12 @@ if VJ then
     -- Hopefully, not many addons does this.
     function VJ.CreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
         local oldCustomFunc = customFunc
+        
+        if istable(sdFile) then
+            sdFile = sdFile[math.random(1, #sdFile)]
+        end
+
+        if not sdFile then return end
 
         customFunc = function(sndP)
             -- This has to be done because VJ's CreateSound calls PlayEx right after a soundpatch is created.
