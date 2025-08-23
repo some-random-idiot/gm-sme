@@ -21,6 +21,7 @@ end
 local exclamations = string.rep("!", exclamationCount + 1)
 
 hook.Add("EntityEmitSound",  exclamations .. "SMEMuffler",  function(sndData)
+    -- This also prevents serverside CSoundPatch from playing.
     if not muffle:GetBool() then return end
 
     if IsValid(sndData.Entity) and not sndData.Pos then

@@ -93,8 +93,6 @@ function soundPatchMeta:Play()
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchPlayOld(self)
@@ -112,8 +110,6 @@ function soundPatchMeta:PlayEx(vol, pitch)
         net.WriteFloat(vol)
         net.WriteUInt(pitch, 8)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchPlayExOld(self, vol, pitch)
@@ -129,8 +125,6 @@ function soundPatchMeta:Stop()
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchStopOld(self)
@@ -149,8 +143,6 @@ function soundPatchMeta:ChangePitch(pitch, delta)
         net.WriteUInt(pitch, 8)
         net.WriteFloat(delta)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchChangePitchOld(self, pitch, delta)
@@ -169,8 +161,6 @@ function soundPatchMeta:ChangeVolume(vol, delta)
         net.WriteFloat(vol)
         net.WriteFloat(delta)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchChangeVolOld(self, vol, delta)
@@ -187,8 +177,6 @@ function soundPatchMeta:FadeOut(seconds)
         net.WriteString(relation.SoundName)
         net.WriteFloat(seconds)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchFadeOutOld(self, seconds)
@@ -205,8 +193,6 @@ function soundPatchMeta:SetDSP(dsp)
         net.WriteString(relation.SoundName)
         net.WriteUInt(dsp, 8)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchSetDSPOld(self, dsp)
@@ -223,8 +209,6 @@ function soundPatchMeta:SetSoundLevel(level)
         net.WriteString(relation.SoundName)
         net.WriteUInt(level, 8)
         net.Send(relation.RecipientFilter)
-
-        return
     end
 
     soundPatchSetSoundLevelOld(self, level)
