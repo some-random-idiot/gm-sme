@@ -37,7 +37,7 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
     if not playedBySME and not sndData.Pos and not IsValid(entity) then return end
 
     local eyePos = ply:EyePos()
-    local origin = sndData.Pos and sndData.Pos or IsValid(entity) and entity:EyePos()
+    local origin = sndData.Pos and sndData.Pos or IsValid(entity) and entity:EyePos() or vector_origin
     local originUp = origin:Angle():Up()
     local originRight = origin:Angle():Right()
     local originFwd = origin:Angle():Forward()
