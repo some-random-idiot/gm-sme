@@ -166,6 +166,10 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
     elseif not playedBySME then
         -- Clientside sound always play before the serverside one can be networked, which is why we can do this.
         predictedSounds[realName] = true
+        timer.Create("SMEInvalidatePredicted", 1, 1, function()
+            -- Invalidate after 1 second.
+            predictedSounds = {}
+        end)
     end
     
     if playedBySME then
