@@ -23,7 +23,8 @@ CreateSound = function(ent, snd, recipientfilter)
     soundPatchRelations[soundPatch] = {
         Entity = ent,
         SoundName = snd,
-        RecipientFilter = recipientfilter
+        RecipientFilter = recipientfilter,
+        Playing = false
     }
 
     net.Start("SMENetworkCreateSound")
@@ -53,7 +54,8 @@ if VJ then
             soundPatchRelations[sndP] = {
                 Entity = ent,
                 SoundName = sdFile,
-                RecipientFilter = VJ_RecipientFilter
+                RecipientFilter = VJ_RecipientFilter,
+                Playing = false
             }
 
             if oldCustomFunc then oldCustomFunc(sndP) end
@@ -82,6 +84,7 @@ local soundPatchChangePitchOld = soundPatchMeta.ChangePitch
 local soundPatchFadeOutOld = soundPatchMeta.FadeOut
 local soundPatchSetDSPOld = soundPatchMeta.SetDSP
 local soundPatchSetSoundLevelOld = soundPatchMeta.SetSoundLevel
+local soundPatchIsPlayingOld = soundPatchMeta.IsPlaying
 
 function soundPatchMeta:Play()
     if muffle:GetBool() then
@@ -89,10 +92,15 @@ function soundPatchMeta:Play()
 
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchPlay", true)
+        net.Start("SMENetworkSoundPatchPlay")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
+
+        timer.Remove(tostring(self) .. "FadeOutUpdateIsPlaying")
+        relation.Playing = true
+
+        return
     end
 
     soundPatchPlayOld(self)
@@ -104,12 +112,17 @@ function soundPatchMeta:PlayEx(vol, pitch)
 
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchPlayEx", true)
+        net.Start("SMENetworkSoundPatchPlayEx")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(vol)
         net.WriteUInt(pitch, 8)
         net.Send(relation.RecipientFilter)
+        
+        timer.Remove(tostring(self) .. "FadeOutUpdateIsPlaying")
+        relation.Playing = true
+
+        return
     end
 
     soundPatchPlayExOld(self, vol, pitch)
@@ -121,10 +134,15 @@ function soundPatchMeta:Stop()
         
         if not relation then return end
         
-        net.Start("SMENetworkSoundPatchStop", true)
+        net.Start("SMENetworkSoundPatchStop")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
+
+        timer.Remove(tostring(self) .. "FadeOutUpdateIsPlaying")
+        relation.Playing = false
+
+        return
     end
 
     soundPatchStopOld(self)
@@ -137,12 +155,14 @@ function soundPatchMeta:ChangePitch(pitch, delta)
         
         if not relation then return end
         
-        net.Start("SMENetworkSoundPatchChangePitch", true)
+        net.Start("SMENetworkSoundPatchChangePitch")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(pitch, 8)
         net.WriteFloat(delta)
         net.Send(relation.RecipientFilter)
+
+        return
     end
 
     soundPatchChangePitchOld(self, pitch, delta)
@@ -155,12 +175,14 @@ function soundPatchMeta:ChangeVolume(vol, delta)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchChangeVol", true)
+        net.Start("SMENetworkSoundPatchChangeVol")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(vol)
         net.WriteFloat(delta)
         net.Send(relation.RecipientFilter)
+
+        return
     end
 
     soundPatchChangeVolOld(self, vol, delta)
@@ -172,11 +194,18 @@ function soundPatchMeta:FadeOut(seconds)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchFadeOut", true)
+        net.Start("SMENetworkSoundPatchFadeOut")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(seconds)
         net.Send(relation.RecipientFilter)
+        
+        timer.Create(tostring(self) .. "FadeOutUpdateIsPlaying", seconds, 1, function()
+            if not relation then return end
+            relation.Playing = false
+        end)
+
+        return
     end
 
     soundPatchFadeOutOld(self, seconds)
@@ -188,11 +217,13 @@ function soundPatchMeta:SetDSP(dsp)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchSetDSP", true)
+        net.Start("SMENetworkSoundPatchSetDSP")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(dsp, 8)
         net.Send(relation.RecipientFilter)
+
+        return
     end
 
     soundPatchSetDSPOld(self, dsp)
@@ -204,12 +235,26 @@ function soundPatchMeta:SetSoundLevel(level)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchSetSoundLevel", true)
+        net.Start("SMENetworkSoundPatchSetSoundLevel")
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(level, 8)
         net.Send(relation.RecipientFilter)
+
+        return
     end
 
     soundPatchSetSoundLevelOld(self, level)
+end
+
+function soundPatchMeta:IsPlaying()
+    if muffle:GetBool() then
+        local relation = soundPatchRelations[self]
+        
+        if not relation then return end
+        
+        return relation.Playing
+    end
+
+    return soundPatchIsPlayingOld(self)
 end
