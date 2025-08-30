@@ -160,12 +160,16 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
         realName = string.sub(sndData.SoundName, 2)
     end
 
+    if not predictedSounds[sndData.Entity] then
+        predictedSounds[sndData.Entity] = {}
+    end
+
     -- We use a hilariously hacky way of determining whether a sound is predicted. Predicted sounds play both clientside and serverside on the same CurTime.
-    if playedBySME and predictedSounds[realName] and sndData.Entity == LocalPlayer() then
+    if playedBySME and sndData.Entity == LocalPlayer() and predictedSounds[sndData.Entity][realName] then
         return false
     elseif not playedBySME then
         -- Clientside sound always play before the serverside one can be networked, which is why we can do this.
-        predictedSounds[realName] = true
+        predictedSounds[sndData.Entity][realName] = true
         timer.Create("SMEInvalidatePredicted", 1, 1, function()
             -- Invalidate after 1 second.
             predictedSounds = {}
