@@ -29,7 +29,7 @@ hook.Add("EntityEmitSound",  exclamations .. "SMEMuffler",  function(sndData)
         sndData.Pos = sndData.Entity:GetPos()
     end
 
-    net.Start("SMENetworkSound")
+    net.Start("SMENetworkSound", true)
     net.WriteTable(sndData)
     net.SendPAS(sndData.Pos and sndData.Pos or IsValid(sndData.Entity) and sndData.Entity:GetPos() or vector_origin)
 

@@ -27,7 +27,7 @@ CreateSound = function(ent, snd, recipientfilter)
         Playing = false
     }
 
-    net.Start("SMENetworkCreateSound")
+    net.Start("SMENetworkCreateSound", true)
     net.WriteEntity(ent)
     net.WriteString(snd)
     net.Send(recipientfilter)
@@ -63,7 +63,7 @@ if VJ then
 
         local soundPatch = oldVJCreateSound(ent, sdFile, sdLevel, sdPitch, customFunc)
 
-        net.Start("SMENetworkCreateSound")
+        net.Start("SMENetworkCreateSound", true)
         net.WriteEntity(ent)
         net.WriteString(sdFile)
         net.Send(VJ_RecipientFilter)
@@ -92,7 +92,7 @@ function soundPatchMeta:Play()
 
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchPlay")
+        net.Start("SMENetworkSoundPatchPlay", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
@@ -112,7 +112,7 @@ function soundPatchMeta:PlayEx(vol, pitch)
 
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchPlayEx")
+        net.Start("SMENetworkSoundPatchPlayEx", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(vol)
@@ -134,7 +134,7 @@ function soundPatchMeta:Stop()
         
         if not relation then return end
         
-        net.Start("SMENetworkSoundPatchStop")
+        net.Start("SMENetworkSoundPatchStop", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.Send(relation.RecipientFilter)
@@ -155,7 +155,7 @@ function soundPatchMeta:ChangePitch(pitch, delta)
         
         if not relation then return end
         
-        net.Start("SMENetworkSoundPatchChangePitch")
+        net.Start("SMENetworkSoundPatchChangePitch", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(pitch, 8)
@@ -175,7 +175,7 @@ function soundPatchMeta:ChangeVolume(vol, delta)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchChangeVol")
+        net.Start("SMENetworkSoundPatchChangeVol", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(vol)
@@ -194,7 +194,7 @@ function soundPatchMeta:FadeOut(seconds)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchFadeOut")
+        net.Start("SMENetworkSoundPatchFadeOut", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteFloat(seconds)
@@ -217,7 +217,7 @@ function soundPatchMeta:SetDSP(dsp)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchSetDSP")
+        net.Start("SMENetworkSoundPatchSetDSP", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(dsp, 8)
@@ -235,7 +235,7 @@ function soundPatchMeta:SetSoundLevel(level)
         
         if not relation then return end
 
-        net.Start("SMENetworkSoundPatchSetSoundLevel")
+        net.Start("SMENetworkSoundPatchSetSoundLevel", true)
         net.WriteEntity(relation.Entity)
         net.WriteString(relation.SoundName)
         net.WriteUInt(level, 8)
