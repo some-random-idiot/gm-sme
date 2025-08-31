@@ -12,7 +12,7 @@ net.Receive("SMENetworkCreateSound", function()
     local soundPatch = CreateSound(ent, snd)
 
     -- Use entity and sound name combined as a key because "You can only create one CSoundPatch per audio file, per entity at the same time.".
-    networkedSoundPatches[ent:EntIndex() .. snd] = soundPatch
+    networkedSoundPatches[ent:EntIndex() .. "." .. snd] = soundPatch
 
     if not entNetworkedSoundPatches[ent] then entNetworkedSoundPatches[ent] = {} end
 
@@ -25,7 +25,7 @@ net.Receive("SMENetworkSoundPatchPlay", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
 
     if not soundPatch then return end
 
@@ -40,7 +40,7 @@ net.Receive("SMENetworkSoundPatchPlayEx", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
 
     if not soundPatch then return end
 
@@ -53,7 +53,7 @@ net.Receive("SMENetworkSoundPatchStop", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
 
     if not soundPatch then return end
 
@@ -69,7 +69,7 @@ net.Receive("SMENetworkSoundPatchChangePitch", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
     
     if not soundPatch then return end
 
@@ -84,7 +84,7 @@ net.Receive("SMENetworkSoundPatchChangeVol", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
     
     if not soundPatch then return end
     
@@ -98,7 +98,7 @@ net.Receive("SMENetworkSoundPatchFadeOut", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
     
     if not soundPatch then return end
 
@@ -112,7 +112,7 @@ net.Receive("SMENetworkSoundPatchSetDSP", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
     
     if not soundPatch then return end
     
@@ -126,7 +126,7 @@ net.Receive("SMENetworkSoundPatchSetSoundLevel", function()
     
     if not IsValid(ent) then return end
 
-    local soundPatch = networkedSoundPatches[ent:EntIndex() .. snd]
+    local soundPatch = networkedSoundPatches[ent:EntIndex() .. "." .. snd]
     
     if not soundPatch then return end
     
@@ -137,9 +137,14 @@ hook.Add("EntityRemoved", "SMEEntCSoundPatchRemove", function(ent, fullUpdate)
     if fullUpdate then return end
     if not entNetworkedSoundPatches[ent] then return end
 
-    for _, soundPatch in ipairs(entNetworkedSoundPatches[ent]) do
+    for key, soundPatch in pairs(networkedSoundPatches) do
+        local entID = string.Split(key, ".")[1]
+
+        if entID != tostring(ent:EntIndex()) then continue end
+        
         soundPatch:Stop()
+        networkedSoundPatches[key] = nil
     end
 
-    entNetworkedSoundPatches[ent] = nil  -- For garbage collection.
+    entNetworkedSoundPatches[ent] = nil
 end)
