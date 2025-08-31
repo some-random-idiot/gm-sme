@@ -1,5 +1,3 @@
--- TODO: Test garbage collection.
-
 local networkedSoundPatches = {}
 local entNetworkedSoundPatches = {}
 
