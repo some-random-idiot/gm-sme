@@ -41,7 +41,7 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
     local originUp = origin:Angle():Up()
     local originRight = origin:Angle():Right()
     local originFwd = origin:Angle():Forward()
-    local filter = entity != ply and table.Add({ entity, entity:GetParent() }, entity:GetChildren()) or {}
+    local filter = IsValid(entity) and entity != ply and table.Add({ entity, entity:GetParent() }, entity:GetChildren()) or {}
     
     local minTr
     local trHitPlayer = false
