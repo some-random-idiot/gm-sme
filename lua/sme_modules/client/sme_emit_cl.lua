@@ -103,6 +103,8 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
             break
         end
 
+        -- This is the distance from the sound hit position to the player. It not actually the wall thickness due to performance reasons.
+        -- It is good enough though.
         local distUp = trUp.HitPos:Distance(eyePos)
         local distDown = trDown.HitPos:Distance(eyePos)
         local distLeft = trLeft.HitPos:Distance(eyePos)
@@ -126,7 +128,9 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
         })
         
         if minTr.Entity == ply then trHitPlayer = true end
-        distMin = minTr.HitPos:Distance(eyePos)
+
+        -- We need to get the true thickness of the wall here because the sound is too easily muffled otherwise.
+        distMin = minTr.HitPos:Distance(util.QuickTrace(eyePos, (origin - eyePos):GetNormalized() * 10000, filter).HitPos)
     end
     
     local dsp = sndData.DSP
@@ -134,9 +138,9 @@ hook.Add("EntityEmitSound", tildes .. "SMEMuffler",  function(sndData)
     local farAF = farMuffleDistance:GetInt() > 0 and trueDist > farMuffleDistance:GetInt() or false
 
     if not trHitPlayer and minTr.Hit then
-        if distMin > 2000 then
+        if distMin > minThickness:GetInt() * 20 then
             dsp = 31
-        elseif distMin > 1000 then
+        elseif distMin > minThickness:GetInt() * 10 then
             dsp = 14
         elseif distMin >= minThickness:GetInt() then
             dsp = 30
